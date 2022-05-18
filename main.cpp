@@ -1,6 +1,10 @@
 #include <iostream>
 #include <cmath>
 #include <numbers>
+#include <random>
+
+#include "vector.h"
+#include "matrix.h"
 
 double f(double x) {
     return (std::pow(x, 9) + std::numbers::pi)
@@ -119,17 +123,79 @@ double newton(double a, double b, double h) {
     return x;
 }
 
+Vector powerIteration(const Matrix& a, Vector r0, double h) {
+    Vector r(10);
+    Vector prev(10);
+    //prev(0) = -10;
+
+    for (int i = 0; i < 100; i++) {
+        r = (a * r0) / (a * r0).norm();
+        r0 = r;
+    }
+
+    /*while (std::abs((prev - r)(0)) > h) {
+        r = (a * r0) / (a * r0).norm();
+        prev = r0;
+        r0 = r;
+    }*/
+    std::cout << (a * r).norm() << std::endl;
+
+    std::cout << ((a * r) * r) / (r * r) << std::endl;
+
+    return r;
+}
+
 int main() {
     //std::cout << f(-1.5) << std::endl; // -1.42
     //std::cout << df(-1.5) << std::endl; // 1.85
     //std::cout << derivative(-1.5) << std::endl;
 
-    Interval* intervals = getNumOfRoots(-10, 10);
+    /*Interval* intervals = getNumOfRoots(-10, 10);
     for (int i = 0; i < 3; i++) {
         Interval interval = bisect(intervals[i].start, intervals[i].end, 10e-4);
         std::cout << "Using interval [" << interval.start << "; " << interval.end << "]" << std::endl;
         std::cout << newton(interval.start, interval.end, 10e-12) << std::endl;
-    }
+    }*/
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr(-2, 5);
+
+    double data[10][10]{{1,-2,1,0,-1,1,-2,2,0,-2},
+                        {0,2,0,0,2,1,-1,-1,-1,-2},
+                        {0,1,0,-1,1,-1,0,-1,1,-1},
+                        {-2,-1,2,-1,0,0,0,0,1,0},
+                        {1,-2,0,1,0,-2,-1,0,2,2},
+                        {-2,-2,0,-2,0,1,1,-2,1,1},
+                        {-1,-2,-1,-1,-2,-1,-2,1,-1,2},
+                        {-2,1,2,-2,0,2,1,-1,-2,2},
+                        {0,1,0,1,1,-2,2,0,1,1},
+                        {0,0,2,-1,-1,0,-2,2,-1,-1}};
+
+
+    Matrix a = Matrix(10, data);
+    /*for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            a(i, j) = distr(gen);
+        }
+    }*/
+    std::cout << a << std::endl;
+
+    Vector r0 = Vector(10);
+    r0(0) = 1;
+    r0(1) = 1;
+    r0(2) = 1;
+    r0(3) = 1;
+    r0(4) = 1;
+    r0(5) = 1;
+    r0(6) = 1;
+    r0(7) = 1;
+    r0(8) = 1;
+    r0(9) = 1;
+
+    std::cout << r0 << std::endl;
+
+    std::cout << powerIteration(a, r0, 10e-8);
 
     return 0;
 }
