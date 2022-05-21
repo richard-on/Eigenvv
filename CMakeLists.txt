@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.21)
 project(mv_02)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(mv_02 main.cpp matrix.cpp matrix.h vector.cpp vector.h)
+add_executable(mv_02 main.cpp matrix.cpp matrix.h vector.cpp vector.h nonLinear.cpp nonLinear.h)

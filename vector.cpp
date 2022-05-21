@@ -13,6 +13,18 @@ Vector::Vector(int len) {
     this->data = new double[len]{0};
 }
 
+Vector::Vector(int len, double val) {
+    if(len < 1) {
+        throw std::invalid_argument("incorrect Vector length");
+    }
+
+    this->len = len;
+    this->data = new double[len];
+    for(int i = 0; i < len; i++) {
+        this->data[i] = val;
+    }
+}
+
 Vector::Vector(int len, double* data) {
     if(len < 1) {
         throw std::invalid_argument("incorrect Vector length");
@@ -22,6 +34,12 @@ Vector::Vector(int len, double* data) {
     for(int i = 0; i < len; i++) {
         this->data[i] = data[i];
     }
+}
+
+Vector::Vector(std::initializer_list<double> list)
+    :len{static_cast<int>(list.size())}, data{new double[static_cast<int>(list.size())]}{
+
+    std::copy(list.begin(), list.end(), data);
 }
 
 Vector::Vector(const Vector &other) {

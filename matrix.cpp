@@ -16,7 +16,7 @@ Matrix::Matrix(int len) {
     }
 }
 
-Matrix::Matrix(int len, double data[10][10]) {
+Matrix::Matrix(int len, double** data) {
     if(len < 2) {
         throw std::invalid_argument("incorrect Matrix dimensions");
     }
@@ -28,6 +28,24 @@ Matrix::Matrix(int len, double data[10][10]) {
         for(int j = 0; j < len; j++) {
             this->data[i][j] = data[i][j];
         }
+    }
+}
+
+Matrix::Matrix(std::initializer_list<std::initializer_list<double>> list)
+    : len{static_cast<int>(list.size())} {
+
+    for (auto val : list) {
+        if (val.size() != len) {
+            throw std::invalid_argument("not a square matrix");
+        }
+    }
+
+    data = new double*[len];
+    int i = 0;
+    for (auto val : list) {
+        data[i] = new double[len];
+        std::copy(val.begin(), val.end(), data[i]);
+        i++;
     }
 }
 

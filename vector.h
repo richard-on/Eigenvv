@@ -5,12 +5,15 @@ class Vector {
 public:
     explicit Vector(int len = 1);
 
+    Vector(int len, double val);
+
     Vector(int len, double* data);
+
+    Vector(std::initializer_list<double> list);
 
     Vector(const Vector& other);
 
     Vector(Vector&& other) noexcept;
-
 
     Vector& operator = (const Vector& other);
 
@@ -26,11 +29,11 @@ public:
 
     Vector operator - (const Vector& a) const;
 
-    Vector operator/(const Vector& other) const;
+    Vector operator / (const Vector& other) const;
 
-    Vector operator/(double other) const;
+    Vector operator / (double other) const;
 
-    double operator*(const Vector& other) const;
+    double operator * (const Vector& other) const;
 
     friend std::ostream& operator << (std::ostream& ostream, const Vector& v);
 

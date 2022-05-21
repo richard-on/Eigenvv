@@ -17,12 +17,13 @@ class Matrix {
 public:
     explicit Matrix(int len = 2);
 
-    Matrix(int len, double data[10][10]);
+    Matrix(int len, double** data);
+
+    Matrix(std::initializer_list<std::initializer_list<double>> list);
 
     Matrix(const Matrix& other);
 
     Matrix(Matrix&& other) noexcept;
-
 
     Matrix& operator = (const Matrix& other);
 
