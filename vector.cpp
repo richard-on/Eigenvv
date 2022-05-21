@@ -153,17 +153,18 @@ Vector Vector::operator/(const Vector& other) const {
 }
 
 Vector Vector::operator/(double other) const {
+    Vector v(len);
     for (int i = 0; i < len; i++) {
-        this->data[i] /= other;
+        v.data[i] = this->data[i] / other;
     }
 
-    return *this;
+    return v;
 }
 
-double Vector::operator*(const Vector& other) const {
-    double v = 0;
+Vector Vector::operator*(const Vector& other) const {
+    Vector v(len);
     for (int i = 0; i < len; i++) {
-        v += this->data[i] * other.data[i];
+        v(i) = this->data[i] * other.data[i];
     }
 
     return v;

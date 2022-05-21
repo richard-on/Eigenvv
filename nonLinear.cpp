@@ -14,8 +14,8 @@ NonLinear::NonLinear(double (*func)(double), double intervalStart, double interv
 
     while (x2 < interval.end) {
         double y2 = func(x2);
-        if (y1 * y2 < 0) {
-            intervals.emplace_back(Interval{x1, x2});
+        if (y1 * y2 <= 0) {
+            intervals.emplace_back(x1, x2);
             rootNum++;
         }
 

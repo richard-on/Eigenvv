@@ -33,7 +33,7 @@ public:
 
     Vector operator / (double other) const;
 
-    double operator * (const Vector& other) const;
+    Vector operator * (const Vector& other) const;
 
     friend std::ostream& operator << (std::ostream& ostream, const Vector& v);
 
