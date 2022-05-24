@@ -242,6 +242,19 @@ int Matrix::length() const {
     return len;
 }
 
+Matrix Matrix::identity(int len) {
+    Matrix m(len);
+    for(int i = 0; i < len; i++) {
+        for(int j = 0; j < len; j++) {
+            if (i == j) {
+                m.data[i][j] = 1;
+            }
+        }
+    }
+
+    return m;
+}
+
 double Matrix::norm() {
     double norm = INT_MIN;
     double columnSum = 0;

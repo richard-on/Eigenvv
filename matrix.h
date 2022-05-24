@@ -47,8 +47,9 @@ public:
 
     friend std::ostream& operator << (std::ostream& ostream, const Matrix& matrix);
 
+    static Matrix identity(int len);
 
-    double **getData() const;
+    double** getData() const;
 
     int length() const;
 

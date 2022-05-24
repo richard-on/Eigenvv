@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <climits>
+#include <complex>
 
 #include "vector.h"
 
@@ -221,4 +222,14 @@ double Vector::norm() {
 
 Vector::~Vector() {
     delete[] data;
+}
+
+std::vector<std::complex<double>> Vector::toVector() {
+    std::vector<std::complex<double>> vec(len);
+
+    for(int i = 0; i < len; i++) {
+        vec[i] = data[i];
+    }
+
+    return vec;
 }

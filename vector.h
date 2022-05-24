@@ -1,6 +1,8 @@
 #ifndef MV_VECTOR_H
 #define MV_VECTOR_H
 
+#include <vector>
+
 class Vector {
 public:
     explicit Vector(int len = 1);
@@ -43,6 +45,8 @@ public:
     int length() const;
 
     double norm();
+
+    std::vector<std::complex<double>> toVector();
 
 
     virtual ~Vector();
