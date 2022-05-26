@@ -62,7 +62,7 @@ Vector::Vector(Vector &&other) noexcept
 
 Vector& Vector::operator=(const Vector &other) {
     if(this != &other){
-        delete[] data;
+        delete[] this->data;
 
         this->len = other.len;
         this->data = new double[len];

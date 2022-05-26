@@ -1,8 +1,10 @@
+#define _USE_MATH_DEFINES
+
 #include <iostream>
 #include <cmath>
-#include <numbers>
 #include <random>
 #include <complex>
+#include <chrono>
 
 #include "vector.h"
 #include "matrix.h"
@@ -10,39 +12,42 @@
 #include "eigen.h"
 
 double f(double x) {
-    return (std::pow(x, 9) + std::numbers::pi)
+    return (std::pow(x, 9) + M_PI)
         * cos(log(std::pow(x, 2) + 1)) /
-        std::pow(std::numbers::e, std::pow(x, 2)) - x / 2022;
+        std::pow(M_E, std::pow(x, 2)) - x / 2022;
 }
 
 double df(double x) {
-    return -2 * std::pow(std::numbers::e, -std::pow(x, 2)) * (std::pow(x, 9) + std::numbers::pi)
+    return -2 * std::pow(M_E, -std::pow(x, 2)) * (std::pow(x, 9) + M_PI)
            * x * sin(log(std::pow(x, 2) + 1)) / (std::pow(x, 2) + 1)
 
-           -2 * std::pow(std::numbers::e, -std::pow(x, 2)) * (std::pow(x, 9) + std::numbers::pi) * x
+           -2 * std::pow(M_E, -std::pow(x, 2)) * (std::pow(x, 9) + M_PI) * x
             * cos(log(std::pow(x, 2) + 1))
 
-           +9 * std::pow(std::numbers::e, -std::pow(x, 2))
+           +9 * std::pow(M_E, -std::pow(x, 2))
               * std::pow(x, 8) * cos(log(std::pow(x, 2) + 1)) - 1.0/2022;
 
 }
 
-int main() {
-    /*auto roots = NonLinear(f, -10, 10).solve();
-    for (auto v : roots) {
-        std::cout << v << std::endl;
-    }*/
+void nonLinearExample() {
 
-    /*std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distr(-2, 5);
-    Matrix a = Matrix(10, data);
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            a(i, j) = distr(gen);
-        }
+    NonLinear nl(f, -10, 10, 0.1);
+
+    auto roots = nl.getRootIntervals();
+    for (auto v : roots) {
+        Solution bisected = nl.bisect(v, 1e-4);
+        Solution nl2 = nl.newton(v);
+
+        std::cout << "Narrowed interval after " << bisected.iterations << " bisect iterations" << std::endl;
+        std::cout << "Using interval [" << bisected.interval.start << "; " << bisected.interval.end << "]" << std::endl;
+        std::cout << "Found root after " << nl2.iterations << " newton iterations" << std::endl;
+        std::cout << "Root: " << nl2.root << std::endl << std::endl;
     }
-    std::cout << a << std::endl;*/
+
+}
+
+int main() {
+    nonLinearExample();
 
     Matrix m1{{1,-2,1,0,-1,1,-2,2,0,-2},
               {0,2,0,0,2,1,-1,-1,-1,-2},
@@ -75,17 +80,12 @@ int main() {
             { -1, 0, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, -1, 1, 1, 0, -1, 0, -1 },
             { -1, 0, 1, 0, 0, 0, 0, -1, 1, -1, 1, -1, 0, -1, -1, 1, 0, 1, 0, 0 },
             { 0, -1, -1, 1, -1, 1, -1, -1, -1, 1, 1, -1, 0, -1, -1, 0, 1, 0, -1, -1 } };
-    //std::cout << m1 << std::endl;
 
-    Matrix test{ {18, -8, -20}, {20, -10, -20}, {8, -8, -10} };
-    //std::cout << m1 << std::endl;
+    std::cout << eigen::powerIteration(m1) << std::endl;
+    std::cout << eigen::powerIteration(m2) << std::endl;
 
-    Vector r1(10, 1);
-    Vector r2(20, 1);
-    std::cout << r1 << std::endl;
-
-    Eigen eigenvv = Eigen::powerIteration(m1, r1, 10e-8);
-    std::cout << eigenvv << std::endl;
+    std::cout << eigen::QR(m1) << std::endl;
+    std::cout << eigen::QR(m2) << std::endl;
 
 
     return 0;

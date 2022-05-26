@@ -1,34 +1,39 @@
 #ifndef MV_02_NONLINEAR_H
 #define MV_02_NONLINEAR_H
 
+#include <vector>
+
 struct Interval {
     double start;
     double end;
 };
 
+struct Solution {
+    double root;
+    Interval interval;
+    int iterations;
+};
+
 class NonLinear {
 public:
-    NonLinear(double (*func)(double), double intervalStart, double intervalEnd, double step = 10e-2);
+    NonLinear(double (*func)(double), double intervalStart, double intervalEnd, double step = 1e-1);
 
-    Interval bisect(int rootPos, double h = 10e-3);
+    Solution bisect(Interval &interval, double eps = 1e-4);
 
-    double newton(int rootPos, double h = 10e-8, double maxIteration = 50000);
+    Solution newton(Interval &interval, double eps = 1e-14, double maxIteration = 10000);
 
-    std::vector<double> solve(double h = 10e-8, double maxIteration = 50000);
+    std::vector<Solution> solve(double eps = 1e-14, double maxIteration = 1000);
 
-    double derivative(double x);
+    double df(double x, double eps = 1e-8);
 
-    const Interval &getInterval() const;
+    double d2f(double x, double eps = 1e-8);
 
-    int getRootsNum() const;
-
-    const std::vector<Interval> &getRoots() const;
+    [[nodiscard]] const std::vector<Interval> &getRootIntervals() const;
 
 private:
     double (*func)(double);
-    Interval interval{};
-    int rootsNum;
-    std::vector<Interval> roots;
+    Interval initialInterval{};
+    std::vector<Interval> rootIntervals{};
 };
 
 

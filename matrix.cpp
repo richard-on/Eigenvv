@@ -190,10 +190,10 @@ Vector Matrix::operator*(const Vector &other) const {
         throw std::invalid_argument("error trying to compare Matrix of different length");
     }
 
-    Vector v = Vector(this->len);
+    Vector v(len);
     for(int i = 0; i < v.length(); i++) {
         for(int k = 0; k < v.length(); k++) {
-            v(i) += this->data[i][k] * other(k);
+            v(i) += data[i][k] * other(k);
         }
     }
 
@@ -245,10 +245,31 @@ int Matrix::length() const {
 Matrix Matrix::identity(int len) {
     Matrix m(len);
     for(int i = 0; i < len; i++) {
-        for(int j = 0; j < len; j++) {
-            if (i == j) {
-                m.data[i][j] = 1;
+        m.data[i][i] = 1;
+    }
+
+    return m;
+}
+
+Matrix Matrix::hessenberg() {
+    Matrix m = *this;
+
+    for(int i = len - 2; i >= 0; i--) {
+        for (int j = i - 1; j >= 0; j--) {
+
+            if (m.data[i + 1][i] == 0) {
+                for (int swap = 0; swap < len; swap++) {
+                    std::swap(m.data[swap][i], m.data[swap][j]);
+                    std::swap(m.data[i][swap], m.data[j][swap]);
+                }
             }
+
+            double mult = -(m.data[i+1][j] / m.data[i+1][i]);
+            for (int swap = 0; swap < len; swap++) {
+                m.data[swap][j] += m.data[swap][i] * mult;
+                m.data[i][swap] -= m.data[j][swap] * mult;
+            }
+
         }
     }
 
@@ -497,3 +518,4 @@ Matrix::~Matrix() {
     }
     delete[] data;
 }
+

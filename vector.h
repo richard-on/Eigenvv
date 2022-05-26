@@ -2,6 +2,7 @@
 #define MV_VECTOR_H
 
 #include <vector>
+#include <complex>
 
 class Vector {
 public:

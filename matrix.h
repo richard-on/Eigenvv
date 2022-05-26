@@ -49,6 +49,8 @@ public:
 
     static Matrix identity(int len);
 
+    Matrix hessenberg();
+
     double** getData() const;
 
     int length() const;
@@ -66,7 +68,6 @@ public:
     Vector solveGaussCol(const Vector& b);
 
     Sor solveSOR(const Vector& b, double param, double eps = 1e-8);
-
 
     virtual ~Matrix();
 

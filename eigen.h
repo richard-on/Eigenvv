@@ -5,7 +5,7 @@
 #include "matrix.h"
 
 enum class EigenKind {
-    UsualMethod, SquareMethod, ComplexMethod, LeastSquares, NoVectors
+    UsualMethod, SquareMethod, ComplexMethod, QRAlgorithm, NoValues
 };
 
 struct Eigenvv {
@@ -13,20 +13,30 @@ struct Eigenvv {
     std::vector<std::complex<double>> vector;
 };
 
-class Eigen {
+class eigen {
 public:
-    Eigen() = delete;
+    eigen() = delete;
 
-    static Eigen powerIteration(const Matrix &matrix, Vector initialGuess, double h = 10e-8, int maxIteration = 10000);
+    static eigen powerIteration(const Matrix &matrix, Vector initialGuess = Vector(1),
+                                double eps = 10e-8, int maxIteration = 20000);
 
-    static Eigen QR(Matrix m, double h = 10e-8, int maxIteration = 10000);
-    std::vector<std::complex<double>> ExtractEigenValuesQr(Matrix<double> m, double eps);
-    static void RotateRow(Matrix &matrix, double c, double s, int master, int slave);
-    static void RotateColumn(Matrix &matrix, double c, double s, int master, int slave);
+    static eigen QR(Matrix m, double eps = 10e-8, int maxIteration = 20000);
 
     static std::string complexToString(std::complex<double> c);
 
-    friend std::ostream& operator << (std::ostream& ostream, const Eigen& eigen);
+    friend std::ostream& operator << (std::ostream& ostream, const eigen& eigen);
+
+    static void normalize(std::vector<std::complex<double>> &cv);
+
+    [[nodiscard]] EigenKind getEigenKind() const;
+
+    [[nodiscard]] std::vector<std::complex<double>> getEigenValues() const;
+
+    [[nodiscard]] std::vector<std::vector<std::complex<double>>> getEigenVectors() const;
+
+    [[nodiscard]] int getNumberOfValues() const;
+
+    [[nodiscard]] int getIterations() const;
 
 private:
     EigenKind eigenKind;
@@ -34,9 +44,8 @@ private:
     int n;
     int iterations;
 
-    Eigen(EigenKind kind, std::vector<Eigenvv> vector1, int i, int i1);
-    static std::vector<std::complex<double>> findComplexLambda(Vector* lv);
-
+    eigen(EigenKind kind, std::vector<Eigenvv> vec, int n, int iter);
+    static std::vector<std::complex<double>> findComplexLambda(std::vector<Vector> lv);
 };
 
 

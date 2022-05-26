@@ -1,21 +1,23 @@
 #include <vector>
+#include <cmath>
+
 #include "nonLinear.h"
 
 NonLinear::NonLinear(double (*func)(double), double intervalStart, double intervalEnd, double step) {
     std::vector<Interval> intervals;
     this->func = func;
-    this->interval.start = intervalStart;
-    this->interval.end = intervalEnd;
+    this->initialInterval.start = intervalStart;
+    this->initialInterval.end = intervalEnd;
     int rootNum = 0;
 
-    double x1 = interval.start;
+    double x1 = initialInterval.start;
     double x2 = x1 + step;
     double y1 = func(x1);
 
-    while (x2 < interval.end) {
+    while (x2 < initialInterval.end) {
         double y2 = func(x2);
-        if (y1 * y2 <= 0) {
-            intervals.emplace_back(x1, x2);
+        if (y1 <= 0 && y2 >= 0 || y1 >= 0 && y2 <= 0) {
+            intervals.push_back(Interval{x1, x2});
             rootNum++;
         }
 
@@ -24,93 +26,80 @@ NonLinear::NonLinear(double (*func)(double), double intervalStart, double interv
         y1 = y2;
     }
 
-    this->roots = intervals;
-    this->rootsNum = rootNum;
+    this->rootIntervals = intervals;
 }
 
-Interval NonLinear::bisect(int rootPos, double h) {
-    Interval curInterval = this->roots.at(rootPos);
-
-    if (func(curInterval.start) == 0) {
-        curInterval.end = curInterval.start;
-        return curInterval;
+Solution NonLinear::bisect(Interval &interval, double eps) {
+    if (func(interval.start) == 0) {
+        return Solution{interval.start, interval, 0};
     }
-    if (func(curInterval.end) == 0) {
-        curInterval.start = curInterval.end;
-        return curInterval;
+    if (func(interval.end) == 0) {
+        return Solution{interval.end, interval, 0};
     }
-    double x0 = curInterval.start;
-    double x = curInterval.end;
-    double xi = 0;
-    int curRoots = 0;
 
-    while (std::abs(x0 - x) > h) {
+    double x0 = interval.start;
+    double x = interval.end;
+    double xi;
+    int iter = 0;
+
+    while (std::abs(x0 - x) > eps) {
         xi = x + (x0 - x) / 2;
         if(func(x) < 0 && func(xi) > 0 || func(x) > 0 && func(xi) < 0) {
             x0 = xi;
-            curRoots++;
         } else {
             x = xi;
         }
+
+        iter++;
     }
 
-    curInterval.start = x0;
-    curInterval.end = x;
-    roots.at(rootPos) = curInterval;
+    interval.start = x0;
+    interval.end = x;
 
-    return curInterval;
+    return Solution{(x - x0)/2, interval, iter};
 }
 
-double NonLinear::newton(int rootPos, double h, double maxIteration) {
-    Interval curInterval = this->roots.at(rootPos);
-    if (func(curInterval.start) * func(curInterval.end) > 0) {
-        return 666;
+Solution NonLinear::newton(Interval &interval, double eps, double maxIteration) {
+    double x0 = interval.start;
+    int iter = 0;
+    if (func(x0) >= 0 && d2f(x0) >= 0 || func(x0) < 0 && d2f(x0) < 0) {
+        x0 = interval.start;
+    } else {
+        x0 = interval.end;
     }
 
-    double x0 = curInterval.start;
-    int iter = 0;
-    if (func(x0) * derivative(derivative(x0)) > 0) {
-        x0 = curInterval.start;
-    } else {
-        x0 = curInterval.end;
-    }
-    double x = x0 - func(x0) / derivative(x0);
-    while (std::abs(x0 - x) > h) {
+    double x = x0 - func(x0) / df(x0);
+    while (std::abs(x0 - x) > eps) {
         x0 = x;
-        x = x - func(x0) / derivative(x0);
+        x = x - func(x0) / df(x0);
         iter++;
         if (iter > maxIteration) {
             break;
         }
     }
 
-    return x;
+    return Solution{x, {x, x}, iter};
 }
 
-std::vector<double> NonLinear::solve(double h, double maxIteration) {
-    std::vector<double> solutions;
+std::vector<Solution> NonLinear::solve(double eps, double maxIteration) {
+    std::vector<Solution> solutions;
 
-    for (int i = 0; i < roots.size(); i++) {
-        bisect(i, 10e-4);
-        solutions.emplace_back(newton(i, h, maxIteration));
+    for (auto& rootInterval : rootIntervals) {
+        bisect(rootInterval, 10e-4);
+        solutions.emplace_back(newton(rootInterval, eps, maxIteration));
     }
 
     return solutions;
 }
 
-double NonLinear::derivative(double x) {
-    double h = 1e-7;
-    return (func(x + h) - func(x - h)) / 2 / h;
+double NonLinear::df(double x, double eps) {
+    return (func(x + eps) - func(x - eps)) / (2 * eps);
 }
 
-const Interval &NonLinear::getInterval() const {
-    return interval;
+double NonLinear::d2f(double x, double eps) {
+    return (func(x + eps) - 2 * func(x) + func(x - eps)) / (eps * eps);
 }
 
-int NonLinear::getRootsNum() const {
-    return rootsNum;
-}
-
-const std::vector<Interval> &NonLinear::getRoots() const {
-    return roots;
+const std::vector<Interval> &NonLinear::getRootIntervals() const {
+    return rootIntervals;
 }
